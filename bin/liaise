@@ -1,0 +1,11 @@
+#! /usr/bin/env ruby
+
+require 'slurry'
+require 'yaml'
+
+def run
+  config = YAML::load(File.read('etc/slurry.yaml'))
+  Slurry.liaise(config[:server],config[:port])
+end
+
+run()

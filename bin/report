@@ -4,8 +4,7 @@ require 'slurry'
 
 
 def run
-  Slurry.funnel
-
+  Slurry.report
 end
 
 run()
