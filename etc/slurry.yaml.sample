@@ -1,0 +1,3 @@
+---
+:server: 'graphite.example.net'
+:port: '2003'

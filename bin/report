@@ -1,0 +1,10 @@
+#! /usr/bin/env ruby
+
+require 'slurry'
+
+
+def run
+  Slurry.report
+end
+
+run()
