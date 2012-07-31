@@ -9,12 +9,13 @@ module Slurry
   # Pull in new data from STDIN
   def funnel
     data = Hash.new
+
     body = ''
     body += STDIN.read
     data[:hash] = JSON.parse(body)
     data[:time] = Time.now.to_i
     pipe(data)
-    Json2Graphite.to_graphite(data[:hash],data[:time])
+
   end
 
   # Push that data to redis
@@ -26,9 +27,11 @@ module Slurry
   # Report the contents of the redis server
   def report
     r = Redis.new
+
     data = Hash.new
     data[:slurry] = Hash.new
     data[:slurry][:waiting] = r.llen('slurry')
+
     puts data.to_json
   end
 
