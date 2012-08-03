@@ -1,7 +1,7 @@
 Gem::Specification.new do |gem|
 
   gem.name    = 'slurry'
-  gem.version = '0.0.3'
+  gem.version = '0.0.4'
   gem.date    = Date.today.to_s
 
   gem.summary     = "A tool that caches json for graphite"
@@ -17,6 +17,7 @@ Gem::Specification.new do |gem|
    gem.executables << 'slurry'
 
    gem.add_dependency('json')
+   gem.add_dependency('redis')
    gem.add_dependency('json2graphite')
 
 end
