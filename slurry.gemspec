@@ -1,11 +1,11 @@
 Gem::Specification.new do |gem|
 
   gem.name    = 'slurry'
-  gem.version = '0.0.1'
+  gem.version = '0.0.2'
   gem.date    = Date.today.to_s
 
   gem.summary     = "A tool that caches json for graphite"
-  gem.description = "A tool that caches json for graphite"
+  gem.description = "A tool that caches json for graphite."
 
   gem.author   = 'Zach Leslie'
   gem.email    = 'xaque208@gmail.com'

@@ -1,11 +1,48 @@
 #! /usr/bin/env ruby
 
+require 'yaml'
+require 'optparse'
 require 'slurry'
 
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: vspheremonitor [options]"
 
-def run
-  Slurry.funnel
+  opts.on("-v", "--verbose", "Be less quiet") do |v|
+    options[:verbose] = v
+  end
+
+  opts.on("-c", "--config FILE", "Specify the configuration file") do |conf|
+    options[:configfile] = conf
+  end
+
+  opts.on("-t", "--type [clean|report]", "The type of run to perform") do |t|
+    options[:type] = t
+  end
+
+end.parse!
+
+def run(options)
+
+  if options[:configfile].nil?
+    configfile = 'etc/slurry.yaml'
+  else
+    configfile = options[:configfile]
+  end
+
+  config = YAML::load(File.read(configfile))
+
+  case options[:type]
+  when "clean"
+    Slurry.clean
+  when "report"
+    Slurry.report
+  when "liaise"
+    Slurry.liaise(config[:server],config[:port])
+  else
+    Slurry.funnel
+  end
 
 end
 
-run()
+run(options)
