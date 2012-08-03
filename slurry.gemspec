@@ -4,8 +4,8 @@ Gem::Specification.new do |gem|
   gem.version = '0.0.1'
   gem.date    = Date.today.to_s
 
-  gem.summary     = "A tool to get the highlights from the Puppet Dashboard"
-  gem.description = "Parses json from the various node states on puppet dashboard and returns those values in a json blob"
+  gem.summary     = "A tool that caches json for graphite"
+  gem.description = "A tool that caches json for graphite"
 
   gem.author   = 'Zach Leslie'
   gem.email    = 'xaque208@gmail.com'
@@ -13,6 +13,10 @@ Gem::Specification.new do |gem|
 
   # ensure the gem is built out of versioned files
    gem.files = Dir['Rakefile', '{bin,lib}/**/*', 'etc/*.sample', 'README*', 'LICENSE*'] & %x(git ls-files -z).split("\0")
+
+   gem.executables << 'slurry'
+
+   gem.add_dependency('json')
 
 end
 
