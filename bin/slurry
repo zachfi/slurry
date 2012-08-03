@@ -23,6 +23,13 @@ OptionParser.new do |opts|
 
 end.parse!
 
+def loadconf (configfile)
+  # Load the configuration file
+  config = YAML::load(File.read(configfile))
+  config
+end
+
+
 def run(options)
 
   # Determine if we should load the default configuration file
@@ -32,9 +39,6 @@ def run(options)
     configfile = options[:configfile]
   end
 
-  # Load the configuration file
-  config = YAML::load(File.read(configfile))
-
   # Determin what kind of run we are asked to perform
   case options[:type]
   when "clean" # Remove everything from the cache
@@ -42,6 +46,7 @@ def run(options)
   when "report" # Report on the state of the cache
     Slurry.report
   when "liaise" # Show the json around the floor
+    config = loadconf(configfile)
     Slurry.liaise(config[:server],config[:port])
   else # Load json data from stdin
     Slurry.funnel
