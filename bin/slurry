@@ -4,6 +4,7 @@ require 'yaml'
 require 'optparse'
 require 'slurry'
 
+# Load the command line options
 options = {}
 OptionParser.new do |opts|
   opts.banner = "Usage: vspheremonitor [options]"
@@ -24,22 +25,25 @@ end.parse!
 
 def run(options)
 
+  # Determine if we should load the default configuration file
   if options[:configfile].nil?
     configfile = 'etc/slurry.yaml'
   else
     configfile = options[:configfile]
   end
 
+  # Load the configuration file
   config = YAML::load(File.read(configfile))
 
+  # Determin what kind of run we are asked to perform
   case options[:type]
-  when "clean"
+  when "clean" # Remove everything from the cache
     Slurry.clean
-  when "report"
+  when "report" # Report on the state of the cache
     Slurry.report
-  when "liaise"
+  when "liaise" # Show the json around the floor
     Slurry.liaise(config[:server],config[:port])
-  else
+  else # Load json data from stdin
     Slurry.funnel
   end
 
