@@ -17,6 +17,7 @@ Gem::Specification.new do |gem|
    gem.executables << 'slurry'
 
    gem.add_dependency('json')
+   gem.add_dependency('json2graphite')
 
 end
 
