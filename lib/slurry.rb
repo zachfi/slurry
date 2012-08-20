@@ -2,26 +2,42 @@ require 'json'
 require "redis"
 require 'json2graphite'
 #require 'graphite-util'
+require 'rockfunnel'
 
 module Slurry
   module_function
 
-  # Pull in new data from STDIN
+  # Reads from STDIN, expects json hash of just data
   def funnel
     data = Hash.new
 
     body = ''
     body += STDIN.read
+    jsondata = JSON.parse(body)
+    exit 1 unless jsondata.is_a? Hash
     data[:hash] = JSON.parse(body)
     data[:time] = Time.now.to_i
     pipe(data)
 
   end
 
-  # Push that data to redis
+  # Receives a hash formatted like so
+  #  {:time=>1345411779,
+  #  :collectd=>
+  #     {"myhostname"=>{"ntpd"=>-0.00142014}}}
+  #
+  # Pushes data into redis
   def pipe (hash)
     redis = Redis.new
     redis.lpush('slurry',hash.to_json)
+  end
+
+  def push_to_redis (data, time=Time.now.to_i)
+    hash = Hash.new
+    hash[:data] = data
+    hash[:time] = time
+    r = Redis.new
+    r.lpush('slurry', hash.to_json)
   end
 
   # Report the contents of the redis server
@@ -32,7 +48,17 @@ module Slurry
     data[:slurry] = Hash.new
     data[:slurry][:waiting] = r.llen('slurry')
 
-    puts data.to_json
+    data
+  end
+
+  def inspect
+    r = Redis.new
+
+    data = Hash.new
+    data = r.lrange("slurry", 0, -1)
+
+    data
+
   end
 
   # Dump clean out everything from redis
@@ -48,7 +74,10 @@ module Slurry
   def liaise (server,port,wait=0.1)
     r = Redis.new
 
-    loop do
+    #loop do
+
+    while r.llen('slurry') > 0 do
+
 
       # Pull something off the list
       popped = r.brpop('slurry')
@@ -56,13 +85,55 @@ module Slurry
 
       # Convert the json into graphite useable data
       processed = Json2Graphite.get_graphite(data["hash"], data["time"])
-      s = TCPSocket.open(server, port)
+      #s = TCPSocket.open(server, port)
       processed.each do |line|
-        s.puts(line)
+        puts line
+      #  s.puts(line)
       end
-      s.close
-      sleep wait
+      #s.close
+      #sleep wait
     end
+
+  end
+
+
+  def runonce (server,port,wait=0.1)
+
+    # This method operates on a different form of hash than the method above.
+    # I am not yet sure how to solve this bit.
+    #
+    r = Redis.new
+    report = Hash.new
+    report[:processed] = 0
+
+    g = RockFunnel::Graphite.new(server,port)
+
+    #loop do
+    while r.llen('slurry') > 0 do
+
+      # Pull something off the list
+      popped = r.rpop('slurry')
+      d = JSON.parse(popped)
+
+      graphite = Json2Graphite.get_graphite(d["data"], d["time"])
+
+      # Convert the json into graphite useable data
+      graphite.each do |d|
+        #pp d
+        target = "#{d[:target]}"
+        value  = "#{d[:value]}"
+        time   = "#{d[:time]}"
+        #puts d.to_json
+        #processed = Json2Graphite.get_graphite(d)
+        #processed.each do |line|
+          g.send(target,value, time)
+          report[:processed] += 1
+        #end
+      end
+      #sleep wait
+    end
+    g.close
+    report.to_json
 
   end
 
