@@ -1,11 +1,27 @@
 require 'json'
 require "redis"
 require 'json2graphite'
-#require 'graphite-util'
-require 'rockfunnel'
 
 module Slurry
   module_function
+
+  class Graphite
+    def initialize(server,port)
+      @server, @port = server, port
+      @s = TCPSocket.open(server,port)
+    end
+
+    def send (target,value,time)
+      line = [target,value,time].join(" ")
+      puts line
+      @s.puts(line)
+    end
+
+    def close
+      @s.close
+    end
+  end
+
 
   # Reads from STDIN, expects json hash of just data
   def funnel
@@ -106,7 +122,7 @@ module Slurry
     report = Hash.new
     report[:processed] = 0
 
-    g = RockFunnel::Graphite.new(server,port)
+    g = Slurry::Graphite.new(server,port)
 
     #loop do
     while r.llen('slurry') > 0 do
