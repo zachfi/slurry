@@ -77,9 +77,7 @@ module Slurry
   end
 
   def push_to_redis (data, time=Time.now.to_i)
-    hash = Hash.new
-    hash[:data] = data
-    hash[:time] = time
+    hash = timestamp(data, time)
     r = Redis.new
     r.lpush('slurry', hash.to_json)
   end
