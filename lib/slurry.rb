@@ -29,11 +29,11 @@ module Slurry
       @s.puts(line)
     end
 
-    # Closes the open socket to the graphite server.
-    #
+    # Close the open socket to the graphite server.
     def close
       @s.close
     end
+
   end
 
 
@@ -100,7 +100,6 @@ module Slurry
     data = r.lrange("slurry", 0, -1)
 
     data
-
   end
 
   # Dump clean out everything from redis
