@@ -48,6 +48,10 @@ def run(options)
   when "liaise" # Show the json around the floor
     config = loadconf(configfile)
     Slurry.liaise(config[:server],config[:port])
+  when "runonce" # Show the json around the floor
+    config = loadconf(configfile)
+    report = JSON.parse(Slurry.runonce(config[:server],config[:port]))
+    puts report.to_json
   else # Load json data from stdin
     Slurry.funnel
   end
