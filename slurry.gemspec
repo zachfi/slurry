@@ -1,7 +1,7 @@
 Gem::Specification.new do |gem|
 
   gem.name    = 'slurry'
-  gem.version = '0.0.6'
+  gem.version = '0.0.7'
   gem.date    = Date.today.to_s
 
   gem.summary     = "A tool that caches json for graphite"
