@@ -1,40 +1,15 @@
+require 'slurry/graphite'
+
 require 'json'
 require "redis"
 require 'json2graphite'
+require 'net/http'
+require 'rest_client'
 
 # @author Zach Leslie <zach@puppetlabs.com>
 #
 module Slurry
   module_function
-
-  # Handles connection details to the graphite server.
-  class Graphite
-
-    # Opens a socket with the specified graphite server.
-    #
-    # @param [String] server
-    # @param [String] port
-    def initialize(server,port)
-      @server, @port = server, port
-      @s = TCPSocket.open(server,port)
-    end
-
-    # Puts the graphite formatted string into the open socket.
-    #
-    # @param [String] target the graphite formatted target in dotted notion
-    # @param [String] value the value of the target
-    # @param [String] time the time that the sample was taken
-    def send (target,value,time)
-      line = [target,value,time].join(" ")
-      @s.puts(line)
-    end
-
-    # Close the open socket to the graphite server.
-    def close
-      @s.close
-    end
-
-  end
 
 
   # Wraps received hash in new hash with timestamp applied.
@@ -63,6 +38,21 @@ module Slurry
     jsondata = JSON.parse(body)
     raise "jsondata is not of class Hash.  Is #{jsondata.class}" unless jsondata.is_a? Hash
     pipe(timestamp(jsondata))
+  end
+
+  # Post the json received on STDIN to a webserver
+  def post(postconfig)
+    body = ''
+    body += STDIN.read
+    jsondata = JSON.parse(body)
+    begin
+      raise "jsondata is not of class Hash.  Is #{jsondata.class}" unless jsondata.is_a? Hash
+      RestClient.post(postconfig[:url], jsondata.to_json, :content_type => :json, :accept => :json )
+    rescue => e
+      puts "something broke:"
+      puts e.message
+      puts e.backtrace.inspect
+    end
   end
 
   # Receives a hash formatted like so
