@@ -1,3 +1,5 @@
 ---
 :server: 'graphite.example.net'
 :port: '2003'
+:post:
+  :url: 'http://rockfunnel.example.net:58765/post-json'

@@ -3,6 +3,8 @@ require 'slurry/graphite'
 require 'json'
 require "redis"
 require 'json2graphite'
+require 'net/http'
+require 'rest_client'
 
 # @author Zach Leslie <zach@puppetlabs.com>
 #
@@ -36,6 +38,21 @@ module Slurry
     jsondata = JSON.parse(body)
     raise "jsondata is not of class Hash.  Is #{jsondata.class}" unless jsondata.is_a? Hash
     pipe(timestamp(jsondata))
+  end
+
+  # Post the json received on STDIN to a webserver
+  def post(postconfig)
+    body = ''
+    body += STDIN.read
+    jsondata = JSON.parse(body)
+    begin
+      raise "jsondata is not of class Hash.  Is #{jsondata.class}" unless jsondata.is_a? Hash
+      RestClient.post(postconfig[:url], jsondata.to_json, :content_type => :json, :accept => :json )
+    rescue => e
+      puts "something broke:"
+      puts e.message
+      puts e.backtrace.inspect
+    end
   end
 
   # Receives a hash formatted like so

@@ -17,7 +17,7 @@ OptionParser.new do |opts|
     options[:configfile] = conf
   end
 
-  opts.on("-t", "--type [clean|report]", "The type of run to perform") do |t|
+  opts.on("-t", "--type [clean|report|runonce|post]", "The type of run to perform") do |t|
     options[:type] = t
   end
 
@@ -52,6 +52,13 @@ def run(options)
     config = loadconf(configfile)
     report = JSON.parse(Slurry.runonce(config[:server],config[:port]))
     puts report.to_json
+  when "post"
+    config = loadconf(configfile)
+    if config[:post]
+      Slurry.post(config[:post])
+    else
+      raise("you need a :post secton in your config file before you use this runtype")
+    end
   else # Load json data from stdin
     Slurry.funnel
   end
