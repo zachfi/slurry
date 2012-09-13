@@ -7,7 +7,7 @@ require 'slurry'
 # Load the command line options
 options = {}
 OptionParser.new do |opts|
-  opts.banner = "Usage: vspheremonitor [options]"
+  opts.banner = "Usage: #{File.basename $0} [options]"
 
   opts.on("-v", "--verbose", "Be less quiet") do |v|
     options[:verbose] = v
