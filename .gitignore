@@ -1,2 +1,3 @@
 etc/slurry.yaml
 /*.gem
+Gemfile.lock
