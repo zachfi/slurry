@@ -2,11 +2,18 @@ require 'slurry'
 
 module Slurry
   class Data
+
+    attr_reader :data
+
     # Data is a hash
     def initialize(initdata)
       @initdata = initdata
       @data = Hash.new
       encap!
+    end
+
+    def data
+      @data
     end
 
     private
@@ -18,7 +25,7 @@ module Slurry
     def encap!
       unless proper?
         timestamp
-        @data[:data] = hash
+        @data[:data] = @initdata
       end
     end
 
@@ -39,7 +46,7 @@ module Slurry
     # storage.  Returns bool
     #
     def proper?
-      @data and @data[:time] and @data[:hash]
+      @data and @data[:time] and @data[:data]
     end
 
   end
